@@ -1,4 +1,5 @@
 ﻿using Api.DataAccess;
+using AutoMapper;
 using System;
 using System.Linq;
 
@@ -8,10 +9,11 @@ namespace Api.BookOperations.CreateData
     {
         private BookStoreDbContext _context;
         public CreateBookModel Model { get; set; }
-
-        public CreateBookCommand(BookStoreDbContext context)
+        private readonly IMapper _mapper;
+        public CreateBookCommand(BookStoreDbContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public void Handle()
         {
@@ -20,12 +22,12 @@ namespace Api.BookOperations.CreateData
             {
                 throw new InvalidOperationException("Hata");
             }
-            book = new Book();
+            book = _mapper.Map<Book>(Model);
 
-            book.Title = Model.Title;
-            book.PageCount=Model.PageCount;
-            book.GenreId=Model.GenreId;
-            book.PublishDate=Model.PublishDate;
+            //book.Title = Model.Title;
+            //book.PageCount=Model.PageCount;
+            //book.GenreId=Model.GenreId;
+            //book.PublishDate=Model.PublishDate;
 
             _context.Books.Add(book);
             _context.SaveChanges();

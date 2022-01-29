@@ -3,6 +3,8 @@ using Api.BookOperations.DeleteData;
 using Api.BookOperations.Query;
 using Api.BookOperations.UpdateData;
 using Api.DataAccess;
+using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,10 +19,11 @@ namespace Api.Controllers
     {
         //  private static List<Book> _books;
         private BookStoreDbContext _dbContext;
-
-        public BooksController(BookStoreDbContext dbContext)
+        private readonly IMapper _mapper;
+        public BooksController(BookStoreDbContext dbContext,IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -56,12 +59,15 @@ namespace Api.Controllers
             //_dbContext.Books.Add(book);
             //_dbContext.SaveChanges();
             //return Ok();
-            var command = new CreateBookCommand(_dbContext);
+            var command = new CreateBookCommand(_dbContext,_mapper);
             
 
             try
             {
                 command.Model = book;
+                CreateBookValidator validator=new CreateBookValidator();
+                 validator.ValidateAndThrow(command);
+              
                 command.Handle();
                
             }
